@@ -54,6 +54,13 @@ class SleepReadingUpdate(BaseModel):
 class SleepReadingResponse(SleepReadingBase):
     # What the API sends back.
     id: int
-    recorded_at: datetime
+    record_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PredictionResponse(BaseModel):
+    reading_id: int
+    quality_score: float
+    quality_label: str
+    model_version: str
