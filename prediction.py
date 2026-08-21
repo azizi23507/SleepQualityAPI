@@ -1,10 +1,11 @@
 MODEL_VERSION = "rule-based-v0"
 
 
-def predict_quality(sleep_duration_hours: float, heart_rate: float, is_deep_sleep: bool) -> dict:
+def predict_quality(sleep_duration_hours: float, heart_rate: float,
+                    is_deep_sleep: bool) -> dict:
     """
     Placeholder scoring logic.
-    Later replaced by a trained scikit-learn model loaded from disk —
+    Later will be replaced by a trained scikit-learn model loaded from disk —
     the signature and return shape stay identical.
     """
     score = 50.0
