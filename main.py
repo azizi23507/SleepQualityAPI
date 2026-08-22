@@ -6,10 +6,13 @@ from models import SleepReadingDB, PatientDB
 from database import SessionLocal
 from schemas import  SleepReadingCreate, SleepReadingUpdate, SleepReadingResponse, \
      PatientCreate, PatientUpdate, PatientResponse, PredictionResponse
-from fastapi import FastAPI, Depends, HTTPException, status, Query
+from fastapi import FastAPI, Depends, HTTPException, status, Query, Security
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-app = FastAPI(title="Sleep Quality API")
+from auth import verify_api_key
+
+
+app = FastAPI(title="Sleep Quality API", dependencies=[Security(verify_api_key)])
 
 def get_db():
     db = SessionLocal()
@@ -19,7 +22,7 @@ def get_db():
         db.close()
 
 # patients' endpoints
-anyway@app.post("/patients", response_model=PatientResponse, status_code=status.HTTP_201_CREATED )
+@app.post("/patients", response_model=PatientResponse, status_code=status.HTTP_201_CREATED )
 def creat_patient(patient: PatientCreate, db: Session= Depends(get_db)):
     new_patient = PatientDB(**patient.model_dump())
     db.add(new_patient)

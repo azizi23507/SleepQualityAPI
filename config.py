@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     database_url: str
-    api_key: str= "dev-placeholder-key"
+    api_key: str
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
