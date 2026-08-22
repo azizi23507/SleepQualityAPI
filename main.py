@@ -19,7 +19,7 @@ def get_db():
         db.close()
 
 # patients' endpoints
-@app.post("/patients", response_model=PatientResponse, status_code=status.HTTP_201_CREATED )
+anyway@app.post("/patients", response_model=PatientResponse, status_code=status.HTTP_201_CREATED )
 def creat_patient(patient: PatientCreate, db: Session= Depends(get_db)):
     new_patient = PatientDB(**patient.model_dump())
     db.add(new_patient)
