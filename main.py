@@ -10,7 +10,12 @@ from fastapi import FastAPI, Depends, HTTPException, status, Query, Security
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from auth import verify_api_key
+import logging
+from logging_config import setup_logging
+from config import settings
 
+setup_logging(settings.log_level)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Sleep Quality API", dependencies=[Security(verify_api_key)])
 
@@ -30,9 +35,11 @@ def creat_patient(patient: PatientCreate, db: Session= Depends(get_db)):
         db.commit()
     except IntegrityError:
         db.rollback()
+        logger.info("Patient created: id=%s", new_patient.id)
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail=f"Email '{patient.email}' is already registered")
     db.refresh(new_patient)
+
     return new_patient
 
 @app.get("/patients/{patient_id}", response_model=PatientResponse)
@@ -133,6 +140,7 @@ def get_health(db: Session = Depends(get_db)):
     try:
         db.execute(text("SELECT 1"))
     except Exception:
+        logger.error("Health check failed: database unreachable")
         raise HTTPException(status_code=503, detail={"status": "unhealthy", "database": "unreachable"})
     return {"status": "ok", "database": "connected"}
 
@@ -175,6 +183,7 @@ def delete_patient(patient_id: int, db: Session = Depends(get_db)):
         db.commit()
     except IntegrityError:
         db.rollback()
+        logger.warning("Delete blocked: patient %s has existing readings", patient_id)
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Cannot delete patient {patient_id}: they have existing sleep readings",
